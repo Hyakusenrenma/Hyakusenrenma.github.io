@@ -1,37 +1,33 @@
-## Welcome to GitHub Pages
+# docker镜像迁移
 
-You can use the [editor on GitHub](https://github.com/Hyakusenrenma/Hyakusenrenma.github.io/edit/main/index.md) to maintain and preview the content for your website in Markdown files.
-
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
-
-### Markdown
-
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
+#### 1、打包
+```
+docker save -o mynetcore.tar mynetcore:v1
 ```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+#### 2、传输
+```
+rsync -av --progress mynetcore.tar root@49.233.9.236:~/
+```
 
-### Jekyll Themes
+#### 3、加载
+```
+docker load -i mynetcore.tar
+```
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/Hyakusenrenma/Hyakusenrenma.github.io/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+```
+mysql
+docker run --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 -d mysql:8.0
 
-### Support or Contact
+redis
+docker run --name myredis -p 6379:6379 -d redis redis-server
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+发布后的netcore
+docker run --name=datavisual2 -d -p 8056:80 -v ~/datavisual2/PublishDocker:/app mynetcore:1.1
+
+vue
+docker run --name vuedatavisual -p 8000:8000 -d nginx:v1
+
+图片服务器
+docker run -d --name image -p 8089:80 -v ~/datavisual2/PublishDocker/wwwroot/UploadFile:/home/images image:v1
+```
